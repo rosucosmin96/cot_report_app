@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>COT Report</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#getReportBtn").click(function(){
+                $.when(
+                    $.get("/get_report_data"),
+                    $.get("/get_performance_data")
+                ).done(function(reportData, performanceData){
+                    // Handle report data
+                    console.log(reportData[0]); // Log the data for debugging
+                    var table = $('<table></table>');
+                    var headers = Object.keys(reportData[0][0]);
+                    var headerRow = $('<tr></tr>');
+                    headers.forEach(function(header) {
+                        headerRow.append('<th>' + header + '</th>');
+                    });
+                    table.append(headerRow);
+                    reportData[0].forEach(function(row) {
+                        var tableRow = $('<tr></tr>');
+                        headers.forEach(function(header) {
+                            var cellValue = row[header];
+                            var cellClass = '';
+                            if (cellValue < 0) {
+                                cellClass = 'negative';
+                            } else if (cellValue > 0) {
+                                cellClass = 'positive';
+                            }
+                            tableRow.append('<td class="' + cellClass + '">' + cellValue + '</td>');
+                        });
+                        table.append(tableRow);
+                    });
+                    $('#reportTable').html(table);
+                    $('#downloadBtn').show(); // Show the download button after successful data fetch
+
+                    // Handle performance data
+                    $('#W1').html(performanceData[0].W1);
+                    $('#M').html(performanceData[0].M);
+                    $('#Q').html(performanceData[0].Q);
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log("Request failed: " + textStatus + ", " + errorThrown); // Log any errors
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<h1>COT Report</h1>
+{% if report_date %}
+    <p>The latest report: {{ report_date }}.</p>
+    <div id="parentDiv">
+        <div class="button-container">
+            <button id="getReportBtn">Get Report</button>
+            <a id="downloadBtn" href="/download" style="display: none;"><button>Download Report</button></a>
+        </div>
+        <div id="reportTable"></div>
+    </div>
+{% else %}
+    <p>Failed to fetch the latest report date. Please try again later.</p>
+{% endif %}
+<div id="W1"></div>
+<div id="M"></div>
+<div id="Q"></div>
+</body>
+</html>
