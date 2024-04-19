@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 
 from utils import get_latest_date_report, get_instrument_cot_url, get_div, DICT_ATTRIBUTE, FX_PERFORMANCE_GRAPHS, \
-    FX_INSTRUMENTS
+    FX_INSTRUMENTS, get_response
 
 
 class COTReport:
@@ -16,7 +16,7 @@ class COTReport:
     def get_cot_report(self, output_file):
         df = pd.DataFrame(columns=['Instrument', 'Long', 'Short'])
         for key, value in FX_INSTRUMENTS.items():
-            response = requests.get(get_instrument_cot_url(value))
+            response = get_response(get_instrument_cot_url(value))
             if response.status_code == 200:
                 soup = BeautifulSoup(response.content, 'html.parser')
                 instrument_data = soup.find('table', class_='table table-striped table-bordered').find(

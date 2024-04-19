@@ -31,7 +31,7 @@ def get_all_xlsx_files(directory):
 
 def get_latest_date_report():
     # Update the latest_date variable with the latest date
-    response = requests.get(f'https://www.tradingster.com/cot/legacy-futures/{FX_INSTRUMENTS["AUD"]}')
+    response = get_response(f'https://www.tradingster.com/cot/legacy-futures/{FX_INSTRUMENTS["AUD"]}')
     latest_date = None
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -41,10 +41,7 @@ def get_latest_date_report():
 
 
 def get_div(url, dict_attribute):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
-    }
-    response = requests.get(url, headers=headers)
+    response = get_response(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
         div_content = soup.find('div', dict_attribute)
@@ -56,4 +53,11 @@ def get_div(url, dict_attribute):
 
 def get_instrument_cot_url(instrument_value: str):
     return f'https://www.tradingster.com/cot/legacy-futures/{instrument_value}'
+
+
+def get_response(url):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36'
+    }
+    return requests.get(url, headers=headers)
 
