@@ -9,7 +9,7 @@
             $('#uploadForm').on('submit', function(e){
                 e.preventDefault();
                 $.ajax({
-                    url: '/upload_photo',
+                    url: '/upload_image',
                     type: 'POST',
                     data: new FormData(this),
                     contentType: false,
@@ -36,8 +36,8 @@
             $("#getReportBtn").click(function(){
                 $.when(
                     $.get("/get_report_data"),
-                    $.get("/get_performance_photos")
-                ).done(function(reportData, performancePhotos){
+                    $.get("/get_performance_images")
+                ).done(function(reportData, performanceImages){
                     // Handle report data
                     console.log(reportData[0]); // Log the data for debugging
                     var table = $('<table></table>');
@@ -64,14 +64,14 @@
                     $('#reportTable').html(table);
                     $('#downloadBtn').show(); // Show the download button after successful data fetch
 
-                    // Handle performance photos
-                    console.log(performancePhotos[0]);
-                    console.log(performancePhotos[0]['photos']);
-                    $('#performancePhotos').empty(); // Clear the div
+                    // Handle performance images
+                    console.log(performanceImages[0]);
+                    console.log(performanceImages[0]['images']);
+                    $('#performanceImages').empty(); // Clear the div
                     var staticUrl = "{{ url_for('static', filename='') }}";
-                    performancePhotos[0]['photos'].forEach(function(photo) {
-                        var img = $('<img>', {src: staticUrl + photo, alt: "Performance photo"});
-                        $('#performancePhotos').append(img);
+                    performanceImages[0]['images'].forEach(function(image) {
+                        var img = $('<img>', {src: staticUrl + image, alt: "Performance image"});
+                        $('#performanceImages').append(img);
                     });
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Request failed: " + textStatus + ", " + errorThrown); // Log any errors
@@ -84,7 +84,7 @@
 <h1>COT Report</h1>
 {% if report_date %}
     <p>The latest report: {{ report_date }}.</p>
-    <form id="uploadForm" action="/upload_photo" method="post" enctype="multipart/form-data">
+    <form id="uploadForm" action="/upload_image" method="post" enctype="multipart/form-data">
         <input type="file" name="file" multiple>
         <input type="submit" value="Upload">
     </form>
@@ -95,7 +95,7 @@
         </div>
         <div class="report-container">
             <div id="reportTable"></div>
-            <div id="performancePhotos"></div>
+            <div id="performanceImages"></div>
         </div>
     </div>
 {% else %}

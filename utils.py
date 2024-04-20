@@ -77,7 +77,7 @@ def allowed_file(filename):
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def delete_photos():
-    photos = [f for f in os.listdir(UPLOAD_FOLDER) if isfile(join(UPLOAD_FOLDER, f)) and allowed_file(f)]
-    for photo in photos:
-        os.remove(os.path.join(UPLOAD_FOLDER, photo))
+def delete_images():
+    images = [f for f in os.listdir(UPLOAD_FOLDER) if isfile(join(UPLOAD_FOLDER, f)) and allowed_file(f)]
+    for image in images:
+        os.remove(os.path.join(UPLOAD_FOLDER, image))

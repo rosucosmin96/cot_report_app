@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template, send_file, jsonify, request
 from werkzeug.utils import secure_filename
 from cot_report import COTReport
-from utils import get_all_xlsx_files, allowed_file, UPLOAD_FOLDER, delete_photos
+from utils import get_all_xlsx_files, allowed_file, UPLOAD_FOLDER, delete_images
 
 OUTPUT_EXCEL_FILE = './cot_report_{}.xlsx'
 
@@ -47,13 +47,13 @@ def get_report_data():
     return data_to_return
 
 
-@app.route('/get_performance_photos')
-def get_performance_photos():
-    return jsonify({'photos': [f for f in os.listdir(UPLOAD_FOLDER) if isfile(join(UPLOAD_FOLDER, f) ) and allowed_file(f)]})
+@app.route('/get_performance_images')
+def get_performance_images():
+    return jsonify({'images': [f for f in os.listdir(UPLOAD_FOLDER) if isfile(join(UPLOAD_FOLDER, f) ) and allowed_file(f)]})
 
 
-@app.route('/upload_photo', methods=['POST'])
-def upload_photo():
+@app.route('/upload_image', methods=['POST'])
+def upload_image():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'})
     files = request.files.getlist('file')
@@ -65,14 +65,15 @@ def upload_photo():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     return jsonify({'success': 'Files uploaded successfully'})
 
-@app.route('/delete_photos')
-def delete_photo():
-    delete_photos()
-    return jsonify({'success': 'Photos deleted successfully'})
+
+@app.route('/delete_images')
+def delete_image():
+    delete_images()
+    return jsonify({'success': 'Images deleted successfully'})
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(delete_photos, 'cron', day_of_week='wed', hour=8)
+scheduler.add_job(delete_images, 'cron', day_of_week='wed', hour=8)
 scheduler.start()
 
 
