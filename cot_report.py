@@ -9,9 +9,6 @@ from utils import get_latest_date_report, get_instrument_cot_url, get_div, DICT_
 class COTReport:
     def __init__(self):
         self.latest_date = get_latest_date_report()
-        self.w_performance = None
-        self.m_performance = None
-        self.q_performance = None
 
     def get_cot_report(self, output_file):
         df = pd.DataFrame(columns=['Instrument', 'Long', 'Short'])

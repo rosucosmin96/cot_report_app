@@ -1,9 +1,13 @@
+from os.path import isfile, join
+
 from bs4 import BeautifulSoup
 import requests
 import glob
 import re
 import os
 
+UPLOAD_FOLDER = './static'
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 DATE_PATTERN = r'\b\d{4}-\d{2}-\d{2}\b'
 DICT_ATTRIBUTE = {
     'id': 'futures'
@@ -67,3 +71,13 @@ def get_response(url):
     }
     return requests.get(url, headers=headers)
 
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def delete_photos():
+    photos = [f for f in os.listdir(UPLOAD_FOLDER) if isfile(join(UPLOAD_FOLDER, f)) and allowed_file(f)]
+    for photo in photos:
+        os.remove(os.path.join(UPLOAD_FOLDER, photo))

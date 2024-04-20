@@ -1,13 +1,17 @@
 import os
-
 import pandas as pd
-from flask import Flask, render_template, send_file, jsonify
+from os.path import isfile, join
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask, render_template, send_file, jsonify, request
+from werkzeug.utils import secure_filename
 from cot_report import COTReport
-from utils import get_all_xlsx_files
+from utils import get_all_xlsx_files, allowed_file, UPLOAD_FOLDER, delete_photos
 
 OUTPUT_EXCEL_FILE = './cot_report_{}.xlsx'
 
+
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 cot_report = COTReport()
 
 
@@ -43,13 +47,33 @@ def get_report_data():
     return data_to_return
 
 
-@app.route('/get_performance_data')
-def get_performance_data():
-    return jsonify({
-        "W1": cot_report.w_performance,
-        "M": cot_report.m_performance,
-        "Q": cot_report.q_performance
-    })
+@app.route('/get_performance_photos')
+def get_performance_photos():
+    return jsonify({'photos': [f for f in os.listdir(UPLOAD_FOLDER) if isfile(join(UPLOAD_FOLDER, f) ) and allowed_file(f)]})
+
+
+@app.route('/upload_photo', methods=['POST'])
+def upload_photo():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'})
+    files = request.files.getlist('file')
+    for file in files:
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'})
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    return jsonify({'success': 'Files uploaded successfully'})
+
+@app.route('/delete_photos')
+def delete_photo():
+    delete_photos()
+    return jsonify({'success': 'Photos deleted successfully'})
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(delete_photos, 'cron', day_of_week='wed', hour=8)
+scheduler.start()
 
 
 if __name__ == '__main__':

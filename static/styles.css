@@ -69,6 +69,11 @@ button:hover {
     justify-content: space-between;
 }
 
+.report-container {
+    display: flex;
+    justify-content: space-between;
+}
+
 #parentDiv {
     display: flex;
     flex-direction: column;
@@ -77,4 +82,10 @@ button:hover {
 
 #reportTable {
     width: 100%; /* Adjust as needed */
+}
+
+#performancePhotos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
