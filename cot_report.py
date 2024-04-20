@@ -45,8 +45,9 @@ class COTReport:
             color = 'white'
             try:
                 value = int(val)
-                color = 'red' if value < 0 else 'lightgreen'
-                return 'background-color: %s' % color
+                text_color = 'white'
+                color = 'red' if value < 0 else 'green'
+                return 'background-color: %s; color: %s' % (color, text_color)
             except ValueError:
                 return 'background-color: %s' % color
 

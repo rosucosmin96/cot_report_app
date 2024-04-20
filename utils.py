@@ -17,6 +17,12 @@ FX_INSTRUMENTS = {
     "CHF": "092741",
     "DXY": "098662",
     "NZD": "112741",
+    "BTC": "133741",
+    "SP 500": "13874%2B",
+    "US 100": "209742",
+    "GOLD": "088691",
+    "SILVER": "084691",
+    "NAT GAS": "023651",
 }
 FX_PERFORMANCE_GRAPHS = {
     "W1": "https://finviz.com/forex_performance.ashx?v=2",
