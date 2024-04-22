@@ -12,7 +12,7 @@ DATE_PATTERN = r'\b\d{4}-\d{2}-\d{2}\b'
 DICT_ATTRIBUTE = {
     'id': 'futures'
 }
-FX_INSTRUMENTS = {
+FX_INSTRUMENTS_TRADINGSTER = {
     "AUD": "232741",
     "GBP": "096742",
     "CAD": "090741",
@@ -33,6 +33,17 @@ FX_PERFORMANCE_GRAPHS = {
     "M": "https://finviz.com/forex_performance.ashx?v=3",
     "Q": "https://finviz.com/forex_performance.ashx?v=4",
 }
+FX_CONTRACTS_AMOUNT = {
+    "AUD": 100000,
+    "GBP": 62500,
+    "CAD": 100000,
+    "EUR": 125000,
+    "JPY": 12500000,
+    "CHF": 125000,
+    "DXY": 1000,
+    "NZD": 100000,
+    "BTC": 5,
+}
 
 
 def get_all_xlsx_files(directory):
@@ -41,7 +52,7 @@ def get_all_xlsx_files(directory):
 
 def get_latest_date_report():
     # Update the latest_date variable with the latest date
-    response = get_response(f'https://www.tradingster.com/cot/legacy-futures/{FX_INSTRUMENTS["AUD"]}')
+    response = get_response(f'https://www.tradingster.com/cot/legacy-futures/{FX_INSTRUMENTS_TRADINGSTER["AUD"]}')
     latest_date = None
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -81,3 +92,34 @@ def delete_images():
     images = [f for f in os.listdir(UPLOAD_FOLDER) if isfile(join(UPLOAD_FOLDER, f)) and allowed_file(f)]
     for image in images:
         os.remove(os.path.join(UPLOAD_FOLDER, image))
+
+
+def get_converted_contract_amount(from_instrument, to_instrument, amount):
+    if from_instrument == "DXY":
+        from_instrument = "USD"
+    if to_instrument == "DXY":
+        to_instrument = "USD"
+
+    print("Converting {} to {}".format(from_instrument, to_instrument))
+    converting_currency_url = "https://www.xe.com/currencyconverter/convert/?Amount={}&From={}&To={}".format(amount, from_instrument, to_instrument)
+    response = get_response(converting_currency_url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+        converted_amount = soup.find('p', class_='sc-1c293993-1 fxoXHw').text.replace(",", "").split(" ")[0]
+        print("Converted amount: ", converted_amount)
+        converted_amount = float(converted_amount)
+        return converted_amount
+    else:
+        print("Failed to fetch data from url: ", converting_currency_url)
+        return None
+
+
+def get_rate_of_contracts(base_contracts, to_contracts):
+    return base_contracts/to_contracts
+
+
+def get_conversion_rate(from_instrument, to_instrument):
+    base_contracts = FX_CONTRACTS_AMOUNT[from_instrument]
+    to_contracts = FX_CONTRACTS_AMOUNT[to_instrument]
+    converted_contract_amount = get_converted_contract_amount(from_instrument, to_instrument, base_contracts)
+    return get_rate_of_contracts(converted_contract_amount, to_contracts)
